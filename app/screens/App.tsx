@@ -1,7 +1,6 @@
 // App.tsx
 import React, { useMemo, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList } from "react-native";
-import "./global.css";
 
 type Tarea = {
   id: number;
