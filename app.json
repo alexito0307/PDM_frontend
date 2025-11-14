@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "nativeWind",
-    "slug": "nativeWind",
+    "name": "Cheicon",
+    "slug": "Cheicon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -26,8 +26,10 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
+    "scheme": "cheicon",
     "plugins": [
-      "expo-asset"
+      "expo-asset",
+      "expo-router"
     ]
   }
 }
