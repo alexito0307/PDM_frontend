@@ -1,23 +1,34 @@
-import { View, Text, TextInput, Pressable, ActivityIndicator, Image, TouchableOpacity } from "react-native";
-import { useRouter, Redirect } from "expo-router";
+import { View, Text, TextInput, Image, TouchableOpacity } from "react-native";
 
 export default function Login() {
-  const router = useRouter();
-
   return (
-    <View className="flex-1 items-center justify-center bg-black px-4 w-full">
-      <Text className="text-white text-lg mb-2">Tester Build</Text>
+    <View className="flex-1 items-center justify-center bg-white px-4 w-full">
       <Image
-        source={require("../../../assets/cheicon-logo.png")}
-        className="w-full h-36 mb-8 self-center"
+        source={require("../../assets/Cheicon_Logo-removebg-preview.png")}
+        className="w-full h-36 self-center"
       />
-      <Text className="text-2xl font-bold mb-6 text-white">Login</Text>
-      <TouchableOpacity
-        className="bg-white rounded-full py-2 px-4"
-        onPress={() => router.push("/screens/feed")}
-      >
-        <Text className="text-black">Go to Feed</Text>
-      </TouchableOpacity>
+      <View className="border border-gray-300 rounded-md p-4 w-full">
+        <Text className="mb-1 font-bold">Email</Text>
+        <TextInput
+          className="border border-gray-300 rounded-md p-2 mb-4 text-gray-900"
+          placeholder="correo@ejemplo.com"
+        />
+        <Text className="mb-1 font-bold">Contraseña</Text>
+        <TextInput
+          className="border border-gray-300 rounded-md p-2 mb-4 text-gray-900"
+          placeholder="Ingrese su contraseña"
+          secureTextEntry
+        />
+        <TouchableOpacity className="p-2 w-100 justify-center items-center bg-[#1B5BA5] rounded-md">
+          <Text className="text-white font-bold">Iniciar sesion</Text>
+        </TouchableOpacity>
+        <View className="mt-4 flex-row justify-center space-x-2">
+          <Text className="font-normal">¿No tienes cuenta?</Text>
+          <TouchableOpacity>
+            <Text className="text-blue-600 font-semibold"> Crear Cuenta</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
