@@ -1,20 +1,78 @@
-import { View, Text, TextInput, Image, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, Image, TouchableOpacity, ActivityIndicator } from "react-native";
+import { useState } from "react";
+import { useRouter } from "expo-router";
 
 
 export default function Login() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [missingData, setMissingData] = useState(false);
+
+  const login = async () => {
+    // Validación
+    if(!email || !password) {
+      console.log("Faltan Datos");
+      setMissingData(true);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await fetch("https://pdm-backend-1sg4.onrender.com/usuarios/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({email, password}),
+      });
+
+      if (!res.ok) {
+        console.log("Credenciales Incorrectas");
+      } else {
+        router.push("/screens/Feed");
+      }
+    } catch (err) {
+      console.log("Error al iniciar sesión: ", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View className="flex-1 items-center justify-center bg-white px-4 w-full">
+      
+      {/* Círculo que va arriba */}
+      <View
+        className="absolute w-72 h-72 bg-[#1B5BA5] rounded-full opacity-2"
+        style={{ top: -80, right: -80 }}
+      />
+
+      {/* Círculo que va abajo */}
+      <View
+        className="absolute w-60 h-60 bg-[#1B5BA5] rounded-full opacity-2"
+        style={{ bottom: -60, left: -60 }}
+      />
+      {/* Logo */ }
       <Image
         source={require("../../assets/Cheicon_Logo-removebg-preview.png")}
         className="w-full h-36 self-center"
       />
+      {/* Box de Login */ }
       <View className="border border-gray-300 rounded-md p-4 w-full">
         <Text className="mb-1 font-bold">Email</Text>
-        <TextInput className="border border-gray-300 rounded-md p-2 mb-4 text-gray-900" placeholder="correo@ejemplo.com" />
+        <TextInput className="border border-gray-300 rounded-md p-2 mb-4 text-gray-900" placeholder="correo@ejemplo.com" value={email} onChangeText={setEmail}/>
         <Text className="mb-1 font-bold">Contraseña</Text>
-        <TextInput className="border border-gray-300 rounded-md p-2 mb-4 text-gray-900" placeholder="Ingrese su contraseña" secureTextEntry />
-        <TouchableOpacity className="p-2 w-100 justify-center items-center bg-[#1B5BA5] rounded-md">
-          <Text className="text-white font-bold">Iniciar sesion</Text>
+        <TextInput className={`rounded-md p-2 text-gray-900 ${missingData ? "mb-2 border border-red-500": "mb-4 border border-gray-300"}`} placeholder="Ingrese su contraseña" value={password} onChangeText={setPassword} secureTextEntry />
+        {missingData ? (
+          <Text className="mb-2 text-red-500 text-xs">Email o contraseña no proporcionados</Text>
+        ): null}
+        <TouchableOpacity className={`p-2 w-full flex-row justify-center items-center bg-[#1B5BA5] rounded-md ${loading ? "opacity-70" : ""}`} onPress={login} disabled={loading}>
+          <Text className="text-white font-bold">Iniciar sesion </Text>
+          {loading ? (
+              <ActivityIndicator className="flex" size='small' color="#fff"/>
+            ) : null}
         </TouchableOpacity>
         <View className="mt-4 flex-row justify-center space-x-2">
           <Text className="font-normal">¿No tienes cuenta?</Text>
