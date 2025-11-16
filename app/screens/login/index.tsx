@@ -31,8 +31,6 @@ export default function Login() {
         console.log("Credenciales Incorrectas");
         return;
       }
-      const data = await res.json();
-      console.log(data);
       router.push("/screens/feed/")
     } catch (err) {
       console.log("Error al iniciar sesión: ", err);
@@ -77,7 +75,7 @@ export default function Login() {
         </TouchableOpacity>
         <View className="mt-4 flex-row justify-center space-x-2">
           <Text className="font-normal">¿No tienes cuenta?</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/screens/signin/")}>
             <Text className="text-blue-600 font-semibold"> Crear Cuenta</Text>
           </TouchableOpacity>
         </View>
