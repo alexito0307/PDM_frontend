@@ -29,7 +29,8 @@
     "scheme": "cheicon",
     "plugins": [
       "expo-asset",
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ]
   }
 }
