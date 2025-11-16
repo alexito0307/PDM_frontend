@@ -4,7 +4,7 @@ export default function Login() {
   return (
     <View className="flex-1 items-center justify-center bg-white px-4 w-full">
       <Image
-        source={require("../../assets/Cheicon_Logo-removebg-preview.png")}
+        source={require("../../../assets/Cheicon_Logo-.png")}
         className="w-full h-36 self-center"
       />
       <View className="border border-gray-300 rounded-md p-4 w-full">
