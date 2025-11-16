@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from "react-native";
 export default function Feed() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Here comes the feed!</Text>
+      <Text style={styles.text}>Here comes the feed!!!!</Text>
     </View>
   );
 }

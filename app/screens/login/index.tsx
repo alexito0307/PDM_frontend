@@ -11,7 +11,6 @@ export default function Login() {
   const [missingData, setMissingData] = useState(false);
 
   const login = async () => {
-    // Validación
     if(!email || !password) {
       console.log("Faltan Datos");
       setMissingData(true);
@@ -30,9 +29,11 @@ export default function Login() {
 
       if (!res.ok) {
         console.log("Credenciales Incorrectas");
-      } else {
-        router.push("/screens/Feed");
+        return;
       }
+      const data = await res.json();
+      console.log(data);
+      router.push("/screens/feed/")
     } catch (err) {
       console.log("Error al iniciar sesión: ", err);
     } finally {
@@ -56,7 +57,7 @@ export default function Login() {
       />
       {/* Logo */ }
       <Image
-        source={require("../../assets/Cheicon_Logo-removebg-preview.png")}
+        source={require("../../../assets/Cheicon_Logo-.png")}
         className="w-full h-36 self-center"
       />
       {/* Box de Login */ }
