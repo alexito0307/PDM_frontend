@@ -10,7 +10,7 @@ export default function Index() {
   useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem("authToken");
-      if(!token) {
+      if (!token) {
         setIsLoggedIn(false);
         setChecking(false);
         return;
@@ -19,10 +19,10 @@ export default function Index() {
         const res = await fetch("https://pdm-backend-1sg4.onrender.com/usuarios/me", {
           method: "GET",
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
-        if (res.ok){
+        if (res.ok) {
           setIsLoggedIn(true);
         } else {
           await AsyncStorage.removeItem("authToken");
@@ -44,10 +44,10 @@ export default function Index() {
   if (checking) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size='large'/>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
 
-  return <Redirect href={isLoggedIn ? "/screens/feed/" : "/screens/login/"} />;
+  return <Redirect href={isLoggedIn ? "/(tabs)/feed" : "/screens/login/"} />;
 }
