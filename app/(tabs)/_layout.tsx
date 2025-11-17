@@ -11,7 +11,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="feed"
         options={{
-          title: "feed",
+          title: "Feed",
         }}
       />
       <Tabs.Screen
