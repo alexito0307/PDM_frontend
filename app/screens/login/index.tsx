@@ -34,14 +34,11 @@ export default function Login() {
 
       const data = await res.json();
       const token = data.access_token;
-      const username = data.usuario.username;
       console.log(token);
-      console.log(username);
       // En data se storea todo lo del usuario
       await AsyncStorage.setItem("authToken", token);
-      await AsyncStorage.setItem("username", username);
 
-      router.push("/(tabs)/feed/");
+      router.push("/screens/feed/");
     } catch (err) {
       console.log("Error al iniciar sesión: ", err);
     } finally {
