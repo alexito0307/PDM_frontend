@@ -5,10 +5,12 @@ export type Post = {
   img_url?: string;
   username: string;
   likes: number;
+  likedBy?: string[];
   created_at?: string;
 };
 
 export type PostCardProps = {
   post: Post;
   onLike: () => void;
+  currentUsername: string;
 };

@@ -49,6 +49,7 @@ export default function Feed() {
 
       if (response.ok) {
         setPosts((prev) => prev.map((post) => (post._id === postId ? { ...post, likes: post.likes + 1 } : post)));
+        console.log("Post liked successfully");
       } else {
         const unlikeResponse = await fetch(`${API_URL}/posts/${postId}/unlike`, {
           method: "POST",
@@ -57,6 +58,7 @@ export default function Feed() {
 
         if (unlikeResponse.ok) {
           setPosts((prev) => prev.map((post) => (post._id === postId ? { ...post, likes: post.likes - 1 } : post)));
+          console.log("Post unliked successfully");
         }
       }
     } catch (error) {
@@ -86,6 +88,7 @@ export default function Feed() {
               key={post._id}
               post={post}
               onLike={() => handleLike(post._id)}
+              currentUsername={username}
             />
           ))}
           {posts.length === 0 && (
