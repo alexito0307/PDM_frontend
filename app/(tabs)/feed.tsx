@@ -1,7 +1,7 @@
-// app/(tabs)/home.tsx
+// app/(tabs)/feed.tsx
 import { View, Text, StyleSheet } from "react-native";
 
-export default function Home() {
+export default function Feed() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Here comes feed!</Text>
