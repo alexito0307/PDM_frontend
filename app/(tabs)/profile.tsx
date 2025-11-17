@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-export default function Feed() {
+export default function Profile() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Here comes the feed!</Text>
+      <Text style={styles.text}>This is the Profile screen!</Text>
     </View>
   );
 }

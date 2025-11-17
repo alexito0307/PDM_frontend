@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { View, Text, TextInput, Image, TouchableOpacity } from "react-native";
 
 export default function Login() {
@@ -28,6 +29,15 @@ export default function Login() {
             <Text className="text-blue-600 font-semibold"> Crear Cuenta</Text>
           </TouchableOpacity>
         </View>
+      </View>
+      {/* Navegación a Feed - para probar la navegación */}
+      <View>
+        <TouchableOpacity
+          className="mt-6 p-8 bg-amber-200 rounded-md"
+          onPress={() => router.replace("/(tabs)/feed")}
+        >
+          <Text>Go to Feed! 🤱🏻</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
