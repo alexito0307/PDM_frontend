@@ -1,6 +1,7 @@
 import { View, Text, TextInput, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export default function Login() {
@@ -31,6 +32,14 @@ export default function Login() {
         console.log("Credenciales Incorrectas");
         return;
       }
+
+      const data = await res.json();
+      const token = data.access_token;
+      console.log(token);
+      // En data se storea todo lo del usuario
+      await AsyncStorage.setItem("authToken", token);
+
+
       router.push("/screens/feed/")
     } catch (err) {
       console.log("Error al iniciar sesión: ", err);
