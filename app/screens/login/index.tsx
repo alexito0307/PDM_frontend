@@ -38,7 +38,7 @@ export default function Login() {
       // En data se storea todo lo del usuario
       await AsyncStorage.setItem("authToken", token);
 
-      router.push("/screens/feed/");
+      router.push("/(tabs)/feed");
     } catch (err) {
       console.log("Error al iniciar sesión: ", err);
     } finally {
