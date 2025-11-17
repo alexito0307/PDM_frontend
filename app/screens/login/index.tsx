@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -12,7 +11,7 @@ export default function Login() {
   const [missingData, setMissingData] = useState(false);
 
   const login = async () => {
-    if(!email || !password) {
+    if (!email || !password) {
       console.log("Faltan Datos");
       setMissingData(true);
       return;
@@ -25,7 +24,7 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({email, password}),
+        body: JSON.stringify({ email, password }),
       });
 
       if (!res.ok) {
@@ -39,8 +38,7 @@ export default function Login() {
       // En data se storea todo lo del usuario
       await AsyncStorage.setItem("authToken", token);
 
-
-      router.push("/screens/feed/")
+      router.push("/screens/feed/");
     } catch (err) {
       console.log("Error al iniciar sesión: ", err);
     } finally {
@@ -50,7 +48,6 @@ export default function Login() {
 
   return (
     <View className="flex-1 items-center justify-center bg-white px-4 w-full">
-      
       {/* Círculo que va arriba */}
       <View
         className="absolute w-72 h-72 bg-[#1B5BA5] rounded-full opacity-2"
@@ -62,25 +59,42 @@ export default function Login() {
         className="absolute w-60 h-60 bg-[#1B5BA5] rounded-full opacity-2"
         style={{ bottom: -60, left: -60 }}
       />
-      {/* Logo */ }
+      {/* Logo */}
       <Image
         source={require("../../../assets/Cheicon_Logo-.png")}
         className="w-full h-36 self-center"
       />
-      {/* Box de Login */ }
+      {/* Box de Login */}
       <View className="border border-gray-300 rounded-md p-4 w-full">
         <Text className="mb-1 font-bold">Email</Text>
-        <TextInput className="border border-gray-300 rounded-md p-2 mb-4 text-gray-900" placeholder="correo@ejemplo.com" value={email} onChangeText={setEmail}/>
+        <TextInput
+          className="border border-gray-300 rounded-md p-2 mb-4 text-gray-900"
+          placeholder="correo@ejemplo.com"
+          value={email}
+          onChangeText={setEmail}
+        />
         <Text className="mb-1 font-bold">Contraseña</Text>
-        <TextInput className={`rounded-md p-2 text-gray-900 ${missingData ? "mb-2 border border-red-500": "mb-4 border border-gray-300"}`} placeholder="Ingrese su contraseña" value={password} onChangeText={setPassword} secureTextEntry />
-        {missingData ? (
-          <Text className="mb-2 text-red-500 text-xs">Email o contraseña no proporcionados</Text>
-        ): null}
-        <TouchableOpacity className={`p-2 w-full flex-row justify-center items-center bg-[#1B5BA5] rounded-md ${loading ? "opacity-70" : ""}`} onPress={login} disabled={loading}>
+        <TextInput
+          className={`rounded-md p-2 text-gray-900 ${missingData ? "mb-2 border border-red-500" : "mb-4 border border-gray-300"}`}
+          placeholder="Ingrese su contraseña"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
+        {missingData ? <Text className="mb-2 text-red-500 text-xs">Email o contraseña no proporcionados</Text> : null}
+        <TouchableOpacity
+          className={`p-2 w-full flex-row justify-center items-center bg-[#1B5BA5] rounded-md ${loading ? "opacity-70" : ""}`}
+          onPress={login}
+          disabled={loading}
+        >
           <Text className="text-white font-bold">Iniciar sesion </Text>
           {loading ? (
-              <ActivityIndicator className="flex" size='small' color="#fff"/>
-            ) : null}
+            <ActivityIndicator
+              className="flex"
+              size="small"
+              color="#fff"
+            />
+          ) : null}
         </TouchableOpacity>
         <View className="mt-4 flex-row justify-center space-x-2">
           <Text className="font-normal">¿No tienes cuenta?</Text>
