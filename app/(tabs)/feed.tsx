@@ -24,13 +24,18 @@ export default function Feed() {
       setError(false);
 
       const storedUsername = await AsyncStorage.getItem("username");
-      if (storedUsername) {
-        setUsername(storedUsername);
-      }
+      if (storedUsername) setUsername(storedUsername);
 
       const response = await fetch(`${API_URL}/posts`);
       const json = await response.json();
-      setPosts(json.posts);
+
+      const mappedPosts = json.posts.map((post: any) => {
+        return {
+          ...post,
+        };
+      });
+
+      setPosts(mappedPosts);
     } catch (error) {
       setError(true);
       console.error("Error fetching posts:", error);
@@ -39,32 +44,30 @@ export default function Feed() {
     }
   };
 
-  const handleLike = async (postId: string) => {
+  async function handleLike(post: Post) {
     try {
       const token = await AsyncStorage.getItem("authToken");
-      const response = await fetch(`${API_URL}/posts/${postId}/like`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
 
-      if (response.ok) {
-        setPosts((prev) => prev.map((post) => (post._id === postId ? { ...post, likes: post.likes + 1 } : post)));
-        console.log("Post liked successfully");
-      } else {
-        const unlikeResponse = await fetch(`${API_URL}/posts/${postId}/unlike`, {
+      // Verificar si el usuario ya dio like
+      const hasLiked = post.liked_by?.includes(username);
+
+      if (hasLiked) {
+        // Si ya dio like, hacer unlike
+        const response = await fetch(`${API_URL}/posts/${post._id}/unlike`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (unlikeResponse.ok) {
-          setPosts((prev) => prev.map((post) => (post._id === postId ? { ...post, likes: post.likes - 1 } : post)));
-          console.log("Post unliked successfully");
-        }
+      } else {
+        // Si no ha dado like, hacer like
+        const response = await fetch(`${API_URL}/posts/${post._id}/like`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
       }
     } catch (error) {
-      console.error("Error liking post:", error);
+      console.error("Error liking/unliking post:", error);
     }
-  };
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -87,7 +90,7 @@ export default function Feed() {
             <PostCard
               key={post._id}
               post={post}
-              onLike={() => handleLike(post._id)}
+              onLike={() => handleLike(post)}
               currentUsername={username}
             />
           ))}

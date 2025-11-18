@@ -5,9 +5,9 @@ export type Post = {
   img_url?: string;
   username: string;
   likes: number;
-  liked_By?: string[];
+  liked_by?: string[];
   created_at?: string;
-  content ?: string;
+  content?: string;
 };
 
 export type PostCardProps = {
@@ -23,6 +23,4 @@ export type User = {
   profilePicture: string;
   avatar_url: string;
   biografia: string;
-}
-
-
+};
