@@ -6,7 +6,7 @@ import { useAuth } from "../../../context/AuthContext";
 
 export default function Signin() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login: authLogin } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,38 +15,34 @@ export default function Signin() {
 
   const [missingData, setMissingData] = useState(false);
   const [loading, setLoading] = useState(false);
-  // 'success' ya no es necesario, el contexto se encargará de la navegación
+
+  const SIGNUP_URL = "https://pdm-backend-1sg4.onrender.com/usuarios/createAccount";
 
   const signin = async () => {
     if (!email || !password || !nombre || !username) {
-      // <-- Agregado 'username'
       console.log("Faltan Datos");
       setMissingData(true);
       return;
     }
 
     setLoading(true);
-    setMissingData(false); // Resetea el error
+    setMissingData(false);
 
     try {
-      const res = await fetch(
-        "https://pdm-backend-1sg4.onrender.com/usuarios/createAccount",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password, nombre, username }),
-        }
-      );
+      const res = await fetch(SIGNUP_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, nombre, username }),
+      });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || "Error al crear la cuenta");
+        throw new Error(errorData.error || "Error al crear la cuenta");
       }
 
-      const data = await res.json();
-      await login(data.token, data.userId, data.username);
+      await authLogin(email, password);
 
     } catch (err) {
       console.log("Error en el registro: ", err);

@@ -1,21 +1,13 @@
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  FlatList,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ActivityIndicator, FlatList, Image, TouchableOpacity} from "react-native";
 import React, { useState, useEffect } from "react";
 import { Link } from "expo-router";
 import { useAuth } from "../../context/AuthContext";
-import { Post, User } from "../types/post";
+import { Post, User } from "../../types/post";
 
 const API_URL = "https://pdm-backend-1sg4.onrender.com";
 
 export default function Profile() {
-  // 1. Obtenemos 'username' y 'token' del contexto
-  const { username, token } = useAuth(); 
+  const { username, token, logout } = useAuth(); 
 
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -23,22 +15,16 @@ export default function Profile() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Si no tenemos el username (aún cargando o no logueado), no hacer nada
     if (!username || !token) {
       setLoading(false);
       return;
     }
-
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-      
       try {
-        // 2. Hacemos UNA SOLA LLAMADA al endpoint que nos da todo
         const response = await fetch(`${API_URL}/usuarios/${username}`, {
           headers: {
-            // Aunque la ruta es pública, es bueno enviar el token
-            // por si en el futuro la proteges
             Authorization: `Bearer ${token}`, 
           },
         });
@@ -48,15 +34,12 @@ export default function Profile() {
         }
 
         const data = await response.json();
-
-        // 3. El endpoint devuelve {'usuario': ..., 'posts': ...}
         if (!data.usuario || !data.posts) {
             throw new Error("La respuesta del backend no tiene el formato esperado.");
         }
 
         setUser(data.usuario);
         setPosts(data.posts);
-
       } catch (err) {
         console.error("Error en fetchData de Perfil:", err);
         setError(err instanceof Error ? err.message : "Error desconocido");
@@ -66,11 +49,8 @@ export default function Profile() {
     };
 
     fetchData();
-  }, [username, token]); // Se ejecuta si el 'username' o 'token' cambian
-
-  // ... (El resto de tu JSX (return, ProfileHeader, RenderPostItem)
-  // ...  es el mismo de antes y debería funcionar perfecto)
-  
+  }, [username, token]);
+ 
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
@@ -95,8 +75,6 @@ export default function Profile() {
     );
   }
 
-  // ... (Pega tu 'ProfileHeader' y 'RenderPostItem' aquí)
-  // ... (Asegúrate de usar 'user.biografia' y 'user.avatar_url')
   const ProfileHeader = () => (
     <View className="p-4 items-center">
       <Image
@@ -105,11 +83,22 @@ export default function Profile() {
       />
       <Text className="text-2xl font-bold mt-4">{user.username}</Text>
       <Text className="text-gray-600 text-center mt-2">{user.biografia}</Text>
+
       <Link href="/profile/edit" asChild>
         <TouchableOpacity className="mt-4 py-2 px-6 border border-gray-300 rounded-full">
           <Text className="font-semibold">Editar Perfil</Text>
         </TouchableOpacity>
       </Link>
+
+      <TouchableOpacity 
+        onPress={() => {
+          console.log("Botón de Logout presionado"); 
+          logout();
+        }}
+        className="mt-4 py-2 px-6 bg-red-500 rounded-full">
+        <Text className="font-semibold text-white">Cerrar Sesión</Text>
+      </TouchableOpacity>
+
       <Text className="text-xl font-bold mt-8 self-start">Mis Posts</Text>
     </View>
   );

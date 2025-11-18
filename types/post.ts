@@ -1,3 +1,5 @@
+export {}; // Esto asegura que el archivo es tratado como un módulo
+
 export type Post = {
   _id: string;
   title: string;
