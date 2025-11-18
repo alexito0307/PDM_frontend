@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { PostCardProps } from "../../../types/post";
+import { PostCardProps } from "../../types/post";
 
 export default function PostCard({ post, onLike, currentUsername }: PostCardProps) {
   const isLiked = post.likedBy?.includes(currentUsername);

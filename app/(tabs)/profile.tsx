@@ -2,7 +2,7 @@ import { View, Text, ActivityIndicator, FlatList, Image, TouchableOpacity} from 
 import React, { useState, useEffect } from "react";
 import { Link } from "expo-router";
 import { useAuth } from "../../context/AuthContext";
-import { Post, User } from "../../types/post";
+import { Post, User } from "../types/post";
 
 const API_URL = "https://pdm-backend-1sg4.onrender.com";
 

@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PostCard from "../components/feed/PostCard";
 import FeedHeader from "../components/feed/FeedHeader";
-import { Post } from "../../types/post";
+import { Post } from "../types/post";
 
 const API_URL = "https://pdm-backend-1sg4.onrender.com";
 
