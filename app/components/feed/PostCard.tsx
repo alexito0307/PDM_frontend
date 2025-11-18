@@ -4,8 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { PostCardProps } from "../../types/post";
 
 export default function PostCard({ post, onLike, currentUsername }: PostCardProps) {
-  const [liked, setLiked] = React.useState(post.liked_by?.includes(currentUsername));
-  const [likesCount, setLikesCount] = React.useState(post.likes || 0);
+  const isLiked = post.likedBy?.includes(currentUsername);
 
   return (
     <View className="bg-white rounded-2xl border border-gray-200 mb-4 px-4 py-3">
@@ -42,20 +41,14 @@ export default function PostCard({ post, onLike, currentUsername }: PostCardProp
 
       {/* Barra de opciones */}
       <View className="flex-row items-center">
-        <TouchableOpacity
-          onPress={() => {
-            setLikesCount(liked ? likesCount - 1 : likesCount + 1);
-            setLiked(!liked);
-            onLike();
-          }}
-        >
+        <TouchableOpacity onPress={onLike}>
           <Ionicons
-            name={liked ? "heart" : "heart-outline"}
+            name={isLiked ? "heart" : "heart-outline"}
             size={20}
-            color={liked ? "red" : "gray"}
+            color={isLiked ? "red" : "gray"}
           />
         </TouchableOpacity>
-        <Text className={`ml-1 text-sm ${liked ? "text-red-500" : "text-gray-600"}`}>{likesCount}</Text>
+        <Text className={`ml-1 text-sm ${isLiked ? "text-red-500" : "text-gray-600"}`}>{post.likes ?? 0}</Text>
       </View>
     </View>
   );

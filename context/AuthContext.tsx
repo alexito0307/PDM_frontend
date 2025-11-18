@@ -27,7 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [token, setToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null); // <-- AÑADIR
+  const [username, setUsername] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -36,12 +36,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const storedToken = await AsyncStorage.getItem("authToken");
         const storedUserId = await AsyncStorage.getItem("userId");
-        const storedUsername = await AsyncStorage.getItem("username"); // <-- AÑADIR
+        const storedUsername = await AsyncStorage.getItem("username");
 
-        if (storedToken && storedUserId && storedUsername) { // <-- AÑADIR
+        if (storedToken && storedUserId && storedUsername) {
           setToken(storedToken);
           setUserId(storedUserId);
-          setUsername(storedUsername); // <-- AÑADIR
+          setUsername(storedUsername);
         }
       } catch (e) {
         console.error("Error cargando datos de auth", e);
@@ -53,18 +53,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     loadAuthData();
   }, []);
 
-  // Función de Login
-  const login = async (newToken: string, newUserId: string, newUsername: string) => { // <-- AÑADIR
+  const login = async (newToken: string, newUserId: string, newUsername: string) => { 
     try {
       await AsyncStorage.setItem("authToken", newToken);
       await AsyncStorage.setItem("userId", newUserId);
-      await AsyncStorage.setItem("username", newUsername); // <-- AÑADIR
+      await AsyncStorage.setItem("username", newUsername);
       
       setToken(newToken);
       setUserId(newUserId);
-      setUsername(newUsername); // <-- AÑADIR
+      setUsername(newUsername);
 
-      router.push("/(app)/feed/"); // Asumiendo que esta es la ruta del feed
+      router.push("/(tabs)/feed/");
     } catch (e) {
       console.error("Error guardando datos de auth", e);
     }
@@ -72,16 +71,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Función de Logout
   const logout = async () => {
+    console.log("Cerrando sesión...");
     try {
       await AsyncStorage.removeItem("authToken");
       await AsyncStorage.removeItem("userId");
-      await AsyncStorage.removeItem("username"); // <-- AÑADIR
+      await AsyncStorage.removeItem("username");
       
       setToken(null);
       setUserId(null);
-      setUsername(null); // <-- AÑADIR
+      setUsername(null);
 
-      router.push("/(auth)/login/");
+      console.log("Datos borrados. Redirigiendo a login.");
+      
+      router.replace("/screens/login")
+
     } catch (e) {
       console.error("Error borrando datos de auth", e);
     }
@@ -89,8 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      // 4. Pasa 'username' al 'value'
-      value={{ token, userId, username, isLoading, login, logout }} // <-- AÑADIR
+      value={{ token, userId, username, isLoading, login, logout }}
     >
       {children}
     </AuthContext.Provider>
