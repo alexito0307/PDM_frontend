@@ -37,12 +37,25 @@ export default function Signin() {
         body: JSON.stringify({ email, password, nombre, username }),
       });
 
+      const data = await res.json(); // 1. Capturamos la respuesta SIEMPRE
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Error al crear la cuenta");
+        throw new Error(data.error || "Error al crear la cuenta");
       }
 
-      await authLogin(email, password, username);
+      console.log("Respuesta del servidor:", data);
+
+      
+      const tokenRecibido = data.token; 
+      const userIdRecibido = data.user ? data.user._id : data.userId; // Ajusta esto según tu backend
+      const usernameRecibido = data.user ? data.user.username : username;
+
+      if (tokenRecibido && userIdRecibido) {
+         await authLogin(tokenRecibido, userIdRecibido, usernameRecibido);
+      } else {
+         Alert.alert("Éxito", "Cuenta creada. Por favor inicia sesión.");
+         router.replace("/screens/login");
+      }
 
     } catch (err) {
       console.log("Error en el registro: ", err);
