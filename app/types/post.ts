@@ -7,6 +7,7 @@ export type Post = {
   likes: number;
   likedBy?: string[];
   created_at?: string;
+  content ?: string;
 };
 
 export type PostCardProps = {
@@ -14,3 +15,14 @@ export type PostCardProps = {
   onLike: () => void;
   currentUsername: string;
 };
+
+export type User = {
+  _id: string;
+  username: string;
+  bio: string;
+  profilePicture: string;
+  avatar_url: string;
+  biografia: string;
+}
+
+

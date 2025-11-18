@@ -2,9 +2,11 @@ import { View, Text, TextInput, Image, TouchableOpacity, ActivityIndicator } fro
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "../../../context/AuthContext";
 
 export default function Login() {
   const router = useRouter();
+  const { login: authLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,11 +36,17 @@ export default function Login() {
 
       const data = await res.json();
       const token = data.access_token;
-      console.log(token);
-      // En data se storea todo lo del usuario
-      await AsyncStorage.setItem("authToken", token);
+      
+      const userId = data.usuario?._id;
+      const username = data.usuario?.username;
+      
+      if (!userId || !token) {
+        console.log("El backend no devolvió token o userId");
+        return;
+      }
+      
+      await authLogin(token, userId, username);
 
-      router.push("/(tabs)/feed");
     } catch (err) {
       console.log("Error al iniciar sesión: ", err);
     } finally {
