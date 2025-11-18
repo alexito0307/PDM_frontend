@@ -47,7 +47,7 @@ export default function Signin() {
 
       
       const tokenRecibido = data.token; 
-      const userIdRecibido = data.user ? data.user._id : data.userId;
+      const userIdRecibido = data.user ? data.user._id : data.userId; // Ajusta esto según tu backend
       const usernameRecibido = data.user ? data.user.username : username;
 
       if (tokenRecibido && userIdRecibido) {
