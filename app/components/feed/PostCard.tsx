@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { PostCardProps } from "../../types/post";
 
 export default function PostCard({ post, onLike, currentUsername }: PostCardProps) {
-  const isLiked = post.likedBy?.includes(currentUsername);
+  const isLiked = post.liked_By?.includes(currentUsername);
 
   return (
     <View className="bg-white rounded-2xl border border-gray-200 mb-4 px-4 py-3">

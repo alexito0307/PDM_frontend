@@ -1,4 +1,3 @@
-
 export type Post = {
   _id: string;
   title: string;
@@ -6,7 +5,7 @@ export type Post = {
   img_url?: string;
   username: string;
   likes: number;
-  likedBy?: string[];
+  liked_By?: string[];
   created_at?: string;
   content ?: string;
 };
