@@ -1,4 +1,3 @@
-export {}; // Esto asegura que el archivo es tratado como un módulo
 
 export type Post = {
   _id: string;
@@ -7,7 +6,7 @@ export type Post = {
   img_url?: string;
   username: string;
   likes: number;
-  liked_by?: string[];
+  likedBy?: string[];
   created_at?: string;
   content ?: string;
 };

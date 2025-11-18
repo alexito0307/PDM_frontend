@@ -42,7 +42,7 @@ export default function Signin() {
         throw new Error(errorData.error || "Error al crear la cuenta");
       }
 
-      await authLogin(email, password);
+      await authLogin(email, password, username);
 
     } catch (err) {
       console.log("Error en el registro: ", err);
