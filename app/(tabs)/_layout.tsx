@@ -14,11 +14,18 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="create-post"
+        options={{
+          title: "Crear Post",
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Perfil",
         }}
       />
+
     </Tabs>
   );
 }
