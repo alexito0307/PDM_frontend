@@ -15,12 +15,3 @@ export type PostCardProps = {
   onLike: () => void;
   currentUsername: string;
 };
-
-export type User = {
-  _id: string;
-  username: string;
-  bio: string;
-  profilePicture: string;
-  avatar_url: string;
-  biografia: string;
-};
