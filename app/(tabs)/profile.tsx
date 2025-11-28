@@ -1,6 +1,6 @@
 import { View, Text, ActivityIndicator, FlatList, Image, TouchableOpacity, Touchable } from "react-native";
 import React, { useState, useEffect, use } from "react";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { User } from "../types/user";
 import { Post } from "../types/post";
 import FeedHeader from "../components/feed/FeedHeader";
@@ -47,7 +47,10 @@ export default function Profile() {
           <Text className="text-2xl font-bold mt-4">{user?.username}</Text>
           <Text className="text-gray-600 mt-2 font-medium">{user?.nombre}</Text>
           <Text className="text-gray-600 mt-2">{user?.biografia}</Text>
-          <TouchableOpacity className="mt-4 bg-gray-500 px-4 py-2 rounded w-40 items-center">
+          <TouchableOpacity
+            className="mt-4 bg-gray-500 px-4 py-2 rounded w-40 items-center"
+            onPress={() => router.push("../profile/edit")}
+          >
             <Text className="text-white font-semibold">Editar Perfil</Text>
           </TouchableOpacity>
         </View>
