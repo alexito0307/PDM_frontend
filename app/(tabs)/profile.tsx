@@ -71,6 +71,14 @@ export default function Profile() {
     return (
       <View className="flex-1 items-center justify-center">
         <Text>Cargando datos del usuario...</Text>
+        <TouchableOpacity 
+          onPress={() => {
+            console.log("Botón de Logout presionado"); 
+            logout();
+          }}
+          className="mt-4 py-2 px-6 bg-red-500 rounded-full">
+          <Text className="font-semibold text-white">Cerrar Sesión</Text>
+      </TouchableOpacity>
       </View>
     );
   }

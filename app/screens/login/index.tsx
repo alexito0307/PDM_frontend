@@ -1,12 +1,13 @@
 import { View, Text, TextInput, Image, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { useAuthStore } from "../../stores/authStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAuth } from "../../../context/AuthContext";
+
 
 export default function Login() {
   const router = useRouter();
-  const { login: authLogin } = useAuth();
+  const setAuth = useAuthStore((state) => state.setAuth); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,18 +36,22 @@ export default function Login() {
       }
 
       const data = await res.json();
+
       const token = data.access_token;
-      
-      const userId = data.usuario?._id;
-      const username = data.usuario?.username;
-      
-      if (!userId || !token) {
-        console.log("El backend no devolvió token o userId");
+      const usuario = data.usuario;
+
+      if (!token || !usuario) {
+        console.log("El backend no devolvió token o usuario");
         return;
       }
-      
-      await authLogin(token, userId, username);
+      await AsyncStorage.setItem("authToken", token)
+      await setAuth({
+        username: usuario.username,
+        avatarUrl: usuario.avatar_url ?? null,
+        token,
+      });
 
+      router.replace("/(tabs)/feed/");
     } catch (err) {
       console.log("Error al iniciar sesión: ", err);
     } finally {

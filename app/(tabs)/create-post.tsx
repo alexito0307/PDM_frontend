@@ -1,61 +1,39 @@
-import { View, Text, ActivityIndicator, FlatList, Image, TouchableOpacity} from "react-native";
-import React, { useState, useEffect } from "react";
-import { Link } from "expo-router";
-import { useAuth } from "../../context/AuthContext";
-import { Post, User } from "../types/post";
+import { View, Text, ActivityIndicator, FlatList, Image, TouchableOpacity, TextInput} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuthStore } from "../stores/authStore";
+import { useState } from "react";
 
 export default function Feed() {
-  const { username, token, logout } = useAuth(); 
-
-  const [user, setUser] = useState<User | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const API_URL = "https://pdm-backend-1sg4.onrender.com";
-
-  useEffect(() => {
-      if (!username || !token) {
-        setLoading(false);
-        return;
-      }
-      const fetchData = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          const response = await fetch(`${API_URL}/usuarios/${username}`, {
-            headers: {
-              Authorization: `Bearer ${token}`, 
-            },
-          });
-  
-          if (!response.ok) {
-            throw new Error(`Error al cargar el perfil (Status: ${response.status})`);
-          }
-  
-          const data = await response.json();
-          if (!data.usuario || !data.posts) {
-              throw new Error("La respuesta del backend no tiene el formato esperado.");
-          }
-  
-          setUser(data.usuario);
-          setPosts(data.posts);
-        } catch (err) {
-          console.error("Error en fetchData de Perfil:", err);
-          setError(err instanceof Error ? err.message : "Error desconocido");
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      fetchData();
-    }, [username, token]);
-
-    
+  const { avatarUrl } = useAuthStore();
+  const [post, setPost] = useState('');
+  const defaultAvatar = "https://preview.redd.it/high-resolution-remakes-of-the-old-default-youtube-avatar-v0-bgwxf7bec4ob1.png?width=640&crop=smart&auto=webp&s=99d5fec405e0c7fc05f94c1e1754f7dc29ccadbd"
   return (
-    <View className="flex flex-1 items-center justify-center px-4">
-      
-      <Text className="text-4xl font-bold">Cuenta lo que quieras...</Text>
-
-    </View>
+    <SafeAreaView
+      className="flex px-5"
+    >
+      <View className="mt-4 flex-row justify-between">
+        <Text className="text-4xl font-bold mr-4">Nuevo Post</Text>
+        <TouchableOpacity
+          className={`p-2 px-8 flex-row justify-center items-center bg-[#1B5BA5] rounded-md`}
+        >
+          <Text className="text-white font-bold justify-end">Post</Text>
+        </TouchableOpacity>
+      </View>
+      <View className="flex-row mt-4">
+        <Image
+          source={{ uri: avatarUrl || defaultAvatar }}
+          className="w-14 h-14 rounded-full mr-4 border"
+        />
+        <TextInput
+          className="flex-1 text-xl"
+          placeholder="Cuenta en que piensas..."
+          multiline
+          textAlignVertical="top"
+          value={post}
+          onChangeText={setPost}
+        >
+        </TextInput>
+      </View>
+    </SafeAreaView>
   );
 }
