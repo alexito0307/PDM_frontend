@@ -27,7 +27,7 @@ export default function Index() {
         
         const data = await res.json();
         const usuario = data.usuario;
-
+        
         const username = usuario.username;
         const avatarUrl = usuario.avatar_url;
   
@@ -48,10 +48,8 @@ export default function Index() {
       } finally {
         setChecking(false);
       }
-      setIsLoggedIn(!!token);
       setChecking(false);
     };
-
     checkToken();
   }, []);
 
