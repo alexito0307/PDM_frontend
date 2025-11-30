@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, ScrollView, ActivityIndicator } from "react-native";
+import { Text, ScrollView, ActivityIndicator, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PostCard from "../components/feed/PostCard";
@@ -8,7 +8,7 @@ import { Post } from "../types/post";
 
 const API_URL = "https://pdm-backend-1sg4.onrender.com";
 
-export default function Feed() {
+export default function Feed(post: Post) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [Error, setError] = useState(false);
@@ -34,8 +34,9 @@ export default function Feed() {
           ...post,
         };
       });
+      const revertedPosts = mappedPosts.reverse();
 
-      setPosts(mappedPosts);
+      setPosts(revertedPosts);
     } catch (error) {
       setError(true);
       console.error("Error fetching posts:", error);
@@ -82,22 +83,23 @@ export default function Feed() {
       ) : Error ? (
         <Text className="text-red-500 text-center mt-10">Error loading posts.</Text>
       ) : (
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
-        >
-          {posts.map((post) => (
+        <FlatList
+          className="p-3"
+          data={posts}
+          onRefresh={loadPosts}
+          refreshing={loading}
+          renderItem={({ item: post }) => (
             <PostCard
-              key={post._id}
               post={post}
               onLike={() => handleLike(post)}
               currentUsername={username}
             />
-          ))}
-          {posts.length === 0 && (
-            <Text className="text-center text-gray-500 mt-10">Todavía no hay posts en CHEICON 🥺</Text>
           )}
-        </ScrollView>
+          keyExtractor={(post) => post._id}
+          ListEmptyComponent={
+            <Text className="text-center text-gray-500 mt-10">Todavía no hay posts en CHEICON 🥺</Text>
+          }
+        />
       )}
     </SafeAreaView>
   );
