@@ -36,17 +36,18 @@ export default function Login() {
 
       const data = await res.json();
       const token = data.access_token;
-      
+
       const userId = data.usuario?._id;
       const username = data.usuario?.username;
-      
+
+      console.log("Login exitoso, token:", token);
+
       if (!userId || !token) {
         console.log("El backend no devolvió token o userId");
         return;
       }
-      
-      await authLogin(token, userId, username);
 
+      await authLogin(token, userId, username);
     } catch (err) {
       console.log("Error al iniciar sesión: ", err);
     } finally {
