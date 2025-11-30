@@ -8,19 +8,18 @@ export type Post = {
   liked_by?: string[];
   created_at?: string;
   content?: string;
+  comments?: Comment[];
+};
+
+export type Comment = {
+  _id: string;
+  username: string;
+  comment: string;
+  created_at: string;
 };
 
 export type PostCardProps = {
   post: Post;
   onLike: () => void;
   currentUsername: string;
-};
-
-export type User = {
-  _id: string;
-  username: string;
-  bio: string;
-  profilePicture: string;
-  avatar_url: string;
-  biografia: string;
 };
