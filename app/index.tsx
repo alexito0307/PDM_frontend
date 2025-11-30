@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { Redirect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuthStore } from "../app/stores/authStore";
 
 export default function Index() {
   const [checking, setChecking] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const setAuth = useAuthStore((state) => state.setAuth); 
 
   useEffect(() => {
     const checkToken = async () => {
@@ -22,7 +24,19 @@ export default function Index() {
             Authorization: `Bearer ${token}`,
           },
         });
+        
+        const data = await res.json();
+        const usuario = data.usuario;
+        
+        const username = usuario.username;
+        const avatarUrl = usuario.avatar_url;
+  
         if (res.ok) {
+          await setAuth({
+            username: username,
+            avatarUrl: avatarUrl ?? null,
+            token,
+          });
           setIsLoggedIn(true);
         } else {
           await AsyncStorage.removeItem("authToken");
@@ -34,10 +48,8 @@ export default function Index() {
       } finally {
         setChecking(false);
       }
-      setIsLoggedIn(!!token);
       setChecking(false);
     };
-
     checkToken();
   }, []);
 
