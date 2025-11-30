@@ -30,6 +30,8 @@ export default function Index() {
         
         const username = usuario.username;
         const avatarUrl = usuario.avatar_url;
+        console.log(username);
+        console.log(avatarUrl);
   
         if (res.ok) {
           await setAuth({

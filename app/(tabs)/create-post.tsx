@@ -64,7 +64,7 @@ export default function Feed() {
   return (
     <SafeAreaView className="flex px-5">
       {/* Header */}
-      <View className="mt-4 flex-row justify-between items-center">
+      <View className="mt-6 flex-row justify-between items-center">
         <Text className="text-4xl font-bold mr-4">Nuevo Post</Text>
 
         <TouchableOpacity
@@ -92,7 +92,7 @@ export default function Feed() {
         {/* Avatar */}
         <Image
           source={{ uri: avatarUrl || defaultAvatar }}
-          className="w-14 h-14 rounded-full mr-4 border"
+          className="w-14 h-14 rounded-full mr-4 border mt-4"
         />
 
         {/* TextInput "Cuenta en que piensas..." */}

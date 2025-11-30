@@ -2,11 +2,9 @@ import { View, Text, TextInput, Image, TouchableOpacity, ActivityIndicator, Aler
 } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { useAuth } from "../../../context/AuthContext"; 
 
 export default function Signin() {
   const router = useRouter();
-  const { login: authLogin } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,31 +35,20 @@ export default function Signin() {
         body: JSON.stringify({ email, password, nombre, username }),
       });
 
-      const data = await res.json(); // 1. Capturamos la respuesta SIEMPRE
+      const data = await res.json(); 
 
       if (!res.ok) {
         throw new Error(data.error || "Error al crear la cuenta");
       }
 
-      console.log("Respuesta del servidor:", data);
-
-      
-      const tokenRecibido = data.token; 
-      const userIdRecibido = data.user ? data.user._id : data.userId; // Ajusta esto según tu backend
-      const usernameRecibido = data.user ? data.user.username : username;
-
-      if (tokenRecibido && userIdRecibido) {
-         await authLogin(tokenRecibido, userIdRecibido, usernameRecibido);
-      } else {
-         Alert.alert("Éxito", "Cuenta creada. Por favor inicia sesión.");
-         router.replace("/screens/login");
-      }
+      Alert.alert("Éxito", "Cuenta creada. Por favor inicia sesión.");
+      router.replace("/screens/login");
 
     } catch (err) {
       console.log("Error en el registro: ", err);
       Alert.alert(
         "Error",
-        err instanceof Error ? err.message : "No se pudo registrar"
+        err instanceof Error ? err.message : "Fallo en el registro"
       );
     } finally {
       setLoading(false);
