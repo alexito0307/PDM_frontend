@@ -4,9 +4,11 @@ import { useAuthStore } from "../stores/authStore";
 import { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 export default function Feed() {
   const { avatarUrl, token } = useAuthStore();
+  const router = useRouter();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const defaultAvatar = "https://preview.redd.it/high-resolution-remakes-of-the-old-default-youtube-avatar-v0-bgwxf7bec4ob1.png?width=640&crop=smart&auto=webp&s=99d5fec405e0c7fc05f94c1e1754f7dc29ccadbd";
@@ -51,13 +53,14 @@ export default function Feed() {
         console.log("Titulo, descripcion o image incorrectas");
         return;
       }
-
+      router.replace("/(tabs)/feed/");
     } catch (err) {
       console.log("Error al publicar post: ", err);
     } finally {
       setDescription("");
       setTitle("");
       setImageUri("");
+      setLoading(false);
     }
   }
 

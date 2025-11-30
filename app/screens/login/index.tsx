@@ -39,6 +39,8 @@ export default function Login() {
 
       const token = data.access_token;
       const usuario = data.usuario;
+      const nombre = data.nombre;
+      const biografia = data.biografia;
 
       if (!token || !usuario) {
         console.log("El backend no devolvió token o usuario");
@@ -49,6 +51,8 @@ export default function Login() {
         username: usuario.username,
         avatarUrl: usuario.avatar_url ?? null,
         token,
+        nombre,
+        biografia,
       });
 
       router.replace("/(tabs)/feed/");
