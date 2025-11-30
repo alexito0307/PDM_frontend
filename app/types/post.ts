@@ -8,6 +8,14 @@ export type Post = {
   liked_by?: string[];
   created_at?: string;
   content?: string;
+  comments?: Comment[];
+};
+
+export type Comment = {
+  _id: string;
+  username: string;
+  comment: string;
+  created_at: string;
 };
 
 export type PostCardProps = {
