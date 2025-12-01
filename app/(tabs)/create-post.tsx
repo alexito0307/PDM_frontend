@@ -160,8 +160,9 @@ export default function Feed() {
 
               <View className="flex-1">
                 <TextInput
-                  className="text-3xl font-bold"
+                  className="text-3xl font-bold text-black"
                   placeholder="Titulo de tu publicación"
+                  placeholderTextColor="#000000"
                   multiline
                   textAlignVertical="top"
                   value={title}
@@ -169,8 +170,9 @@ export default function Feed() {
                 />
                 <View className="border-b border-gray-700 my-4" />
                 <TextInput
-                  className="text-xl"
+                  className="text-xl text-black"
                   placeholder="Cuenta en que piensas..."
+                  placeholderTextColor="#9CA3AF"
                   multiline
                   textAlignVertical="top"
                   value={description}

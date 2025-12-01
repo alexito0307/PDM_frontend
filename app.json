@@ -13,9 +13,13 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cheicon.app",
+      "buildNumber": "1.0.0"
     },
     "android": {
+      "package": "com.cheicon.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -31,6 +35,13 @@
       "expo-asset",
       "expo-router",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c9000002-48b1-4b46-b56d-f60ad91f64f6"
+      }
+    },
+    "owner": "alejandro_ponce"
   }
 }

@@ -214,6 +214,7 @@ export default function editProfile() {
               <TextInput
                 className="border border-gray-300 rounded-md p-2 w-64 mb-4"
                 placeholder="Tu Nombre Completo"
+                placeholderTextColor="#9CA3AF"
                 value={newFullName}
                 onChangeText={setNewFullName}
               />
@@ -223,6 +224,7 @@ export default function editProfile() {
               <TextInput
                 className="border border-gray-300 rounded-md p-2 w-64 mb-4"
                 placeholder="Tu Biografía"
+                placeholderTextColor="#9CA3AF"
                 value={newBio}
                 numberOfLines={4}
                 textAlignVertical="top"
