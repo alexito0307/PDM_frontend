@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, FlatList, Image, TouchableOpacity, TextInput, Alert} from "react-native";
+import { View, Text, ActivityIndicator, FlatList, Image, TouchableOpacity, TextInput, Alert, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "../stores/authStore";
 import { useEffect, useState } from "react";
@@ -119,71 +119,78 @@ export default function Feed() {
 
 
   return (
-    <SafeAreaView className="flex px-5">
-      {/* Header */}
-      <View className="mt-6 flex-row justify-between items-center">
-        <Text className="text-4xl font-bold mr-4">Nuevo Post</Text>
+    <SafeAreaView className="flex-1">
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View className="flex-1 px-5">
+            {/* Header */}
+            <View className="mt-6 flex-row justify-between items-center">
+              <Text className="text-4xl font-bold mr-4">Nuevo Post</Text>
 
-        <TouchableOpacity
-          className= {`mr-3 p-2 rounded-md`}
-          onPress={pickImage}
-        >
-          <MaterialIcons name="image" size={24} color="#1B5BA5" />
-        </TouchableOpacity>
+              <TouchableOpacity
+                className="mr-3 p-2 rounded-md"
+                onPress={pickImage}
+              >
+                <MaterialIcons name="image" size={24} color="#1B5BA5" />
+              </TouchableOpacity>
 
-        <TouchableOpacity className={`p-2 px-8 flex-row justify-center items-center rounded-md ${posteable ? "bg-[#1B5BA5] " : "bg-gray-300"} ${loading ? "opacity-70" : ""} `} onPress={publish}>
-          <Text className="text-white font-bold justify-end">Post </Text>
-          {loading ? (
-            <ActivityIndicator
-              className="flex"
-              size="small"
-              color="#fff"
-            />
-          ) : null}
-        </TouchableOpacity>
-      </View>
-
-      {/* Avatar + contenido */}
-      <View className="flex-row mt-4">
-
-        {/* Avatar */}
-        <Image
-          source={{ uri: avatarUrl || defaultAvatar }}
-          className="w-14 h-14 rounded-full mr-4 border mt-4"
-        />
-
-        {/* TextInput "Cuenta en que piensas..." */}
-        <View className="flex-1">
-          <TextInput
-            className="text-3xl font-bold"
-            placeholder="Titulo de tu publicación"
-            multiline
-            textAlignVertical="top"
-            value={title}
-            onChangeText={setTitle}
-          />
-          <View className="border-b border-gray-700 my-4"/>
-          <TextInput
-            className="text-xl"
-            placeholder="Cuenta en que piensas..."
-            multiline
-            textAlignVertical="top"
-            value={description}
-            onChangeText={setDescription}
-          />
-
-          {/* Preview de la imagen */} 
-          {imageUri !== "" && (
-            <View className="mt-4 w-full rounded-2xl overflow-hidden items-center justify-center">
-              <Image
-                source={{ uri: imageUri }}
-                className="w-full aspect-[3/4]"
-                resizeMode="contain"
-              />
+              <TouchableOpacity
+                className={`p-2 px-8 flex-row justify-center items-center rounded-md ${
+                  posteable ? "bg-[#1B5BA5]" : "bg-gray-300"
+                } ${loading ? "opacity-70" : ""}`}
+                onPress={publish}
+                disabled={loading}
+              >
+                <Text className="text-white font-bold justify-end">Post </Text>
+                {loading ? (
+                  <ActivityIndicator className="flex" size="small" color="#fff" />
+                ) : null}
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
-      </View>
+
+            {/* Avatar + contenido */}
+            <View className="flex-row mt-4">
+              <Image
+                source={{ uri: avatarUrl || defaultAvatar }}
+                className="w-14 h-14 rounded-full mr-4 border mt-4"
+              />
+
+              <View className="flex-1">
+                <TextInput
+                  className="text-3xl font-bold"
+                  placeholder="Titulo de tu publicación"
+                  multiline
+                  textAlignVertical="top"
+                  value={title}
+                  onChangeText={setTitle}
+                />
+                <View className="border-b border-gray-700 my-4" />
+                <TextInput
+                  className="text-xl"
+                  placeholder="Cuenta en que piensas..."
+                  multiline
+                  textAlignVertical="top"
+                  value={description}
+                  onChangeText={setDescription}
+                />
+
+                {imageUri !== "" && (
+                  <View className="mt-4 w-full rounded-2xl overflow-hidden items-center justify-center">
+                    <Image
+                      source={{ uri: imageUri }}
+                      className="w-full aspect-[3/4]"
+                      resizeMode="contain"
+                    />
+                  </View>
+                )}
+              </View>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
