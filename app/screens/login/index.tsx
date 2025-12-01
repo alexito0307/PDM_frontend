@@ -88,6 +88,7 @@ export default function Login() {
         <TextInput
           className={`border rounded-md p-2 mb-4 text-gray-900 ${missingData ? "mb-2 border border-red-500" : "mb-4 border border-gray-300"}`}
           placeholder="correo@ejemplo.com"
+          placeholderTextColor="#9CA3AF"
           value={email}
           onChangeText={setEmail}
         />
@@ -95,6 +96,7 @@ export default function Login() {
         <TextInput
           className={`rounded-md p-2 text-gray-900 ${missingData ? "mb-2 border border-red-500" : "mb-4 border border-gray-300"}`}
           placeholder="Ingrese su contraseña"
+          placeholderTextColor="#9CA3AF"
           value={password}
           onChangeText={setPassword}
           secureTextEntry

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, ActivityIndicator, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import PostCard from "../components/feed/PostCard";
 import FeedHeader from "../components/feed/FeedHeader";
 import { Post } from "../types/post";
@@ -12,9 +11,9 @@ const API_URL = "https://pdm-backend-1sg4.onrender.com";
 export default function Feed() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [Error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  // username y token SIEMPRE del store
+  // username y token del store
   const { username, token } = useAuthStore();
 
   useEffect(() => {
@@ -24,18 +23,43 @@ export default function Feed() {
   const loadPosts = async () => {
     try {
       setLoading(true);
-      setError(false);
+      setErrorMsg(null);
 
-      const response = await fetch(`${API_URL}/posts`);
-      const json = await response.json();
+      const res = await fetch(`${API_URL}/posts`, {
+        headers: token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : undefined,
+      });
 
-      const mappedPosts = json.posts.map((post: any) => ({ ...post }));
+      let bodyText = await res.text();
+      console.log("GET /posts status:", res.status);
+      console.log("GET /posts body:", bodyText);
+
+      if (!res.ok) {
+        setErrorMsg(`Status ${res.status}: ${bodyText.slice(0, 100)}`);
+        return;
+      }
+
+      // si sí fue ok, parseamos el JSON
+      const json = JSON.parse(bodyText);
+
+      // por si el backend devuelve array directo o {posts: [...]}
+      const postsArray = Array.isArray(json) ? json : json.posts;
+
+      if (!postsArray) {
+        setErrorMsg("La respuesta no trae 'posts'");
+        return;
+      }
+
+      const mappedPosts = postsArray.map((post: any) => ({ ...post }));
       const revertedPosts = mappedPosts.reverse();
 
       setPosts(revertedPosts);
-    } catch (error) {
-      setError(true);
+    } catch (error: any) {
       console.error("Error fetching posts:", error);
+      setErrorMsg(error?.message || "Error desconocido");
     } finally {
       setLoading(false);
     }
@@ -61,7 +85,6 @@ export default function Feed() {
         return;
       }
 
-      // actualizar estado local
       setPosts((prevPosts) =>
         prevPosts.map((p) => {
           if (p._id !== post._id) return p;
@@ -87,9 +110,9 @@ export default function Feed() {
 
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" className="mt-10" />
-      ) : Error ? (
-        <Text className="text-red-500 text-center mt-10">
-          Error loading posts.
+      ) : errorMsg ? (
+        <Text className="text-red-500 text-center mt-10 px-4">
+          Error loading posts: {errorMsg}
         </Text>
       ) : (
         <FlatList

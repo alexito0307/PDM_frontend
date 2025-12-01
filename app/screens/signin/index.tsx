@@ -72,6 +72,7 @@ export default function Signin() {
             missingData ? "border-red-500" : ""
           }`}
           placeholder="Tu nombre completo" 
+          placeholderTextColor="#9CA3AF"
           value={nombre}
           onChangeText={setNombre}
         />
@@ -81,6 +82,7 @@ export default function Signin() {
             missingData ? "border-red-500" : ""
           }`}
           placeholder="Tu nombre de usuario"
+          placeholderTextColor="#9CA3AF"
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
@@ -91,6 +93,7 @@ export default function Signin() {
             missingData ? "border-red-500" : ""
           }`}
           placeholder="correo@ejemplo.com"
+          placeholderTextColor="#9CA3AF"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -104,6 +107,7 @@ export default function Signin() {
               : "mb-4 border border-gray-300"
           }`}
           placeholder="Ingrese su contraseña"
+          placeholderTextColor="#9CA3AF"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
