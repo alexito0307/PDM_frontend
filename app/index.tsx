@@ -30,6 +30,8 @@ export default function Index() {
         
         const username = usuario.username;
         const avatarUrl = usuario.avatar_url;
+        const nombre = usuario.nombre;
+        const biografia = usuario.biografia;
         console.log(username);
         console.log(avatarUrl);
   
@@ -38,6 +40,8 @@ export default function Index() {
             username: username,
             avatarUrl: avatarUrl ?? null,
             token,
+            nombre, 
+            biografia
           });
           setIsLoggedIn(true);
         } else {

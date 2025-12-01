@@ -32,6 +32,7 @@ export default function Login() {
 
       if (!res.ok) {
         console.log("Credenciales Incorrectas");
+        setMissingData(true);
         return;
       }
 
@@ -39,6 +40,8 @@ export default function Login() {
 
       const token = data.access_token;
       const usuario = data.usuario;
+      const nombre = data.nombre;
+      const biografia = data.biografia;
 
       if (!token || !usuario) {
         console.log("El backend no devolvió token o usuario");
@@ -49,6 +52,8 @@ export default function Login() {
         username: usuario.username,
         avatarUrl: usuario.avatar_url ?? null,
         token,
+        nombre,
+        biografia,
       });
 
       router.replace("/(tabs)/feed/");
@@ -81,7 +86,7 @@ export default function Login() {
       <View className="border border-gray-300 rounded-md p-4 w-full">
         <Text className="mb-1 font-bold">Email</Text>
         <TextInput
-          className="border border-gray-300 rounded-md p-2 mb-4 text-gray-900"
+          className={`border rounded-md p-2 mb-4 text-gray-900 ${missingData ? "mb-2 border border-red-500" : "mb-4 border border-gray-300"}`}
           placeholder="correo@ejemplo.com"
           value={email}
           onChangeText={setEmail}
@@ -94,7 +99,7 @@ export default function Login() {
           onChangeText={setPassword}
           secureTextEntry
         />
-        {missingData ? <Text className="mb-2 text-red-500 text-xs">Email o contraseña no proporcionados</Text> : null}
+        {missingData ? <Text className="mb-2 text-red-500 text-xs">Email o contraseña no validos</Text> : null}
         <TouchableOpacity
           className={`p-2 w-full flex-row justify-center items-center bg-[#1B5BA5] rounded-md ${loading ? "opacity-70" : ""}`}
           onPress={login}

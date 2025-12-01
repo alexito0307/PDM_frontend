@@ -7,6 +7,7 @@ import FeedHeader from "../components/feed/FeedHeader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PostCard from "../components/feed/PostCard";
+import { useAuthStore } from "../stores/authStore";
 
 const API_URL = "https://pdm-backend-1sg4.onrender.com";
 
@@ -14,32 +15,7 @@ export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
-  const [username, setUsername] = useState("");
-
-  const loadUserData = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-
-      const storedUsername = await AsyncStorage.getItem("username");
-      if (storedUsername) setUsername(storedUsername);
-
-      const response = await fetch(`${API_URL}/usuarios/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const json = await response.json();
-      const userData = json.usuario;
-
-      setUser(userData);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-  useEffect(() => {
-    loadUserData();
-  }, []);
+  const { username, nombre, biografia, avatarUrl } = useAuthStore();
 
   const loadAllPosts = async () => {
     try {
@@ -62,19 +38,17 @@ export default function Profile() {
   }, []);
 
   const filterUserPosts = () => {
-    if (user) {
-      const filteredPosts = allPosts.filter((post) => post.username === user.username);
-      setUserPosts(filteredPosts);
+    const filteredPosts = allPosts.filter((post) => post.username === username);
+    setUserPosts(filteredPosts);
 
-      const json = JSON.stringify(filteredPosts);
+    const json = JSON.stringify(filteredPosts);
 
-      const mappedPosts = JSON.parse(json).map((post: any) => {
-        return {
-          ...post,
-        };
-      });
-      setUserPosts(mappedPosts);
-    }
+    const mappedPosts = JSON.parse(json).map((post: any) => {
+      return {
+        ...post,
+      };
+    });
+    setUserPosts(mappedPosts);
   };
 
   useEffect(() => {
@@ -86,7 +60,7 @@ export default function Profile() {
       const token = await AsyncStorage.getItem("authToken");
 
       // Verificar si el usuario ya dio like
-      const hasLiked = post.liked_by?.includes(username);
+      const hasLiked = post.liked_by?.includes(username || "");
 
       if (hasLiked) {
         // Si ya dio like, hacer unlike
@@ -114,13 +88,13 @@ export default function Profile() {
           <View>
             <Image
               source={{
-                uri: user?.avatar_url || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+                uri: avatarUrl || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
               }}
               style={{ width: 100, height: 100, borderRadius: 50 }}
             />
-            <Text className="text-2xl font-bold mt-4">{user?.username}</Text>
-            <Text className="text-gray-600 mt-2 font-medium">{user?.nombre}</Text>
-            <Text className="text-gray-600 mt-2">{user?.biografia}</Text>
+            <Text className="text-2xl font-bold mt-4">{username}</Text>
+            <Text className="text-gray-600 mt-2 font-medium">{nombre}</Text>
+            <Text className="text-gray-600 mt-2">{biografia}</Text>
             <View className="flex-row mt-4 gap-x-2">
               <TouchableOpacity
                 className="bg-gray-500 px-4 py-2 rounded-2xl w-40 h-10 items-center justify-center"
@@ -151,7 +125,7 @@ export default function Profile() {
                 onLike={() => {
                   handleLike(post);
                 }}
-                currentUsername={user?.username || ""}
+                currentUsername={username || ""}
               />
             ))}
             {userPosts.length === 0 && (

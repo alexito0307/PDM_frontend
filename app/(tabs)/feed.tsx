@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Text, ScrollView, ActivityIndicator, FlatList } from "react-native";
+import { Text, ActivityIndicator, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PostCard from "../components/feed/PostCard";
 import FeedHeader from "../components/feed/FeedHeader";
 import { Post } from "../types/post";
+import { useAuthStore } from "../stores/authStore";
 
 const API_URL = "https://pdm-backend-1sg4.onrender.com";
 
-export default function Feed(post: Post) {
+export default function Feed() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [Error, setError] = useState(false);
-  const [username, setUsername] = useState("");
+
+  // username y token SIEMPRE del store
+  const { username, token } = useAuthStore();
 
   useEffect(() => {
     loadPosts();
@@ -23,17 +26,10 @@ export default function Feed(post: Post) {
       setLoading(true);
       setError(false);
 
-      const storedUsername = await AsyncStorage.getItem("username");
-      if (storedUsername) setUsername(storedUsername);
-
       const response = await fetch(`${API_URL}/posts`);
       const json = await response.json();
 
-      const mappedPosts = json.posts.map((post: any) => {
-        return {
-          ...post,
-        };
-      });
+      const mappedPosts = json.posts.map((post: any) => ({ ...post }));
       const revertedPosts = mappedPosts.reverse();
 
       setPosts(revertedPosts);
@@ -47,24 +43,39 @@ export default function Feed(post: Post) {
 
   async function handleLike(post: Post) {
     try {
-      const token = await AsyncStorage.getItem("authToken");
-
-      // Verificar si el usuario ya dio like
-      const hasLiked = post.liked_by?.includes(username);
-
-      if (hasLiked) {
-        // Si ya dio like, hacer unlike
-        const response = await fetch(`${API_URL}/posts/${post._id}/unlike`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      } else {
-        // Si no ha dado like, hacer like
-        const response = await fetch(`${API_URL}/posts/${post._id}/like`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+      if (!token || !username) {
+        console.log("No hay token o username, no se puede likear");
+        return;
       }
+
+      const hasLiked = post.liked_by?.includes(username);
+      const endpoint = hasLiked ? "unlike" : "like";
+
+      const res = await fetch(`${API_URL}/posts/${post._id}/${endpoint}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        console.log("Error en like/unlike", await res.text());
+        return;
+      }
+
+      // actualizar estado local
+      setPosts((prevPosts) =>
+        prevPosts.map((p) => {
+          if (p._id !== post._id) return p;
+
+          const likedBy = p.liked_by ?? [];
+
+          return {
+            ...p,
+            liked_by: hasLiked
+              ? likedBy.filter((u) => u !== username)
+              : [...likedBy, username],
+          };
+        })
+      );
     } catch (error) {
       console.error("Error liking/unliking post:", error);
     }
@@ -75,13 +86,11 @@ export default function Feed(post: Post) {
       <FeedHeader />
 
       {loading ? (
-        <ActivityIndicator
-          size="large"
-          color="#0000ff"
-          className="mt-10"
-        />
+        <ActivityIndicator size="large" color="#0000ff" className="mt-10" />
       ) : Error ? (
-        <Text className="text-red-500 text-center mt-10">Error loading posts.</Text>
+        <Text className="text-red-500 text-center mt-10">
+          Error loading posts.
+        </Text>
       ) : (
         <FlatList
           className="p-3"
@@ -92,13 +101,10 @@ export default function Feed(post: Post) {
             <PostCard
               post={post}
               onLike={() => handleLike(post)}
-              currentUsername={username}
+              currentUsername={username || ""}
             />
           )}
           keyExtractor={(post) => post._id}
-          ListEmptyComponent={
-            <Text className="text-center text-gray-500 mt-10">Todavía no hay posts en CHEICON 🥺</Text>
-          }
         />
       )}
     </SafeAreaView>

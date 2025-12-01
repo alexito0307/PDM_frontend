@@ -6,6 +6,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,79 +15,162 @@ import { use, useEffect, useState } from "react";
 import { TextInput } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuthStore } from "../stores/authStore";
+import * as ImagePicker from "expo-image-picker";
+import { ActivityIndicator } from "react-native";
+const CLOUDINARY_CLOUD_NAME = "dfahbky8d";         
+const CLOUDINARY_UPLOAD_PRESET = "cheicon_unsigned";
+
+async function uploadImageToCloudinary(uri: string): Promise<string> {
+  const data = new FormData();
+
+  data.append("file", {
+    uri,
+    type: "image/jpeg", // ajusta si usas otro formato
+    name: "upload.jpg",
+  } as any);
+
+  data.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: "POST",
+      body: data,
+    }
+  );
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    console.log("Error Cloudinary:", json);
+    throw new Error("Error al subir la imagen");
+  }
+
+  // URL pública https
+  return json.secure_url as string;
+}
 
 const API_URL = "https://pdm-backend-1sg4.onrender.com";
 
 export default function editProfile() {
-  const [user, setUser] = useState<User | null>(null);
+  
   const [newAvatarUrl, setNewAvatarUrl] = useState<string>("");
-  const [newUserName, setNewUserName] = useState<string>("");
+  const [loading, setLoading] = useState(false);
   const [newFullName, setNewFullName] = useState<string>("");
   const [newBio, setNewBio] = useState<string>("");
+  const { avatarUrl, nombre, biografia, setUserInfo } = useAuthStore();
+  const [imageUri, setImageUri] = useState(avatarUrl || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y");
 
-  const loadUserData = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-
-      const response = await fetch(`${API_URL}/usuarios/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  const pickImage = async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status != "granted") {
+        alert("Se requiere acceso a galería para subir fotos");
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
       });
+  
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+      }
+    };
 
-      const json = await response.json();
-      const userData = json.usuario;
-
-      setUser(userData);
-      console.log("User data loaded:", userData);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  };
-  const changeProfileAvatar = async (newAvatarUrl: string) => {
+  const handleSaveProfile = async () => {
     try {
+      setLoading(true);
       const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        Alert.alert("Error", "No se encontró el token de sesión");
+        return;
+      }
+
+      // Nombre y bio finales (si dejan vacío, se queda lo anterior)
+      const finalNombre =
+        newFullName.trim() === "" ? nombre : newFullName.trim();
+      const finalBio = newBio.trim() === "" ? biografia : newBio.trim();
+
+      // Avatar final: partimos de lo que se ve en pantalla
+      let finalAvatar =
+        imageUri ||
+        avatarUrl ||
+        "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+
+      // Si la imagen cambió y no es http(s), la subimos a Cloudinary
+      const avatarChanged = finalAvatar !== avatarUrl;
+      const isLocalFile =
+        finalAvatar && !finalAvatar.startsWith("http://") && !finalAvatar.startsWith("https://");
+
+      if (avatarChanged && isLocalFile) {
+        try {
+          finalAvatar = await uploadImageToCloudinary(finalAvatar);
+        } catch (err) {
+          console.error("Error subiendo avatar:", err);
+          Alert.alert(
+            "Error",
+            "No se pudo subir la nueva foto de perfil. Inténtalo de nuevo."
+          );
+          return;
+        }
+      }
+
+      const payload: any = {};
+
+      if (finalNombre && finalNombre !== nombre) {
+        payload.nombre = finalNombre;
+      }
+      if (finalBio && finalBio !== biografia) {
+        payload.biografia = finalBio;
+      }
+      if (finalAvatar && finalAvatar !== avatarUrl) {
+        payload.avatar_url = finalAvatar;
+      }
+
+      if (Object.keys(payload).length === 0) {
+        console.log("No hay cambios que guardar");
+        Alert.alert("Sin cambios", "No hiciste ningún cambio en tu perfil");
+        return;
+      }
+
       const response = await fetch(`${API_URL}/usuarios/me/update`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ avatar_url: newAvatarUrl }),
+        body: JSON.stringify(payload),
       });
-      if (response.ok) {
-        console.log("Profile avatar updated successfully");
-        setNewAvatarUrl("");
-        loadUserData();
-      }
-    } catch (error) {
-      console.error("Error updating profile avatar:", error);
-    }
-  };
-  const changeUserInfo = async (newFullName: string, newBio: string) => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      const response = await fetch(`${API_URL}/usuarios/me/update`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ nombre: newFullName, biografia: newBio }),
-      });
-      if (response.ok) {
-        console.log("User Data updated successfully");
 
-        loadUserData();
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Error actualizando perfil:", text);
+        Alert.alert("Error", "No se pudo actualizar tu perfil");
+        return;
       }
+
+      console.log("User data updated successfully");
+
+      // Actualizar el store local con lo definitivo
+      setUserInfo({
+        nombre: finalNombre ?? nombre ?? "",
+        biografia: finalBio ?? biografia ?? "",
+        avatarUrl: finalAvatar ?? avatarUrl ?? "",
+      });
+
+      Alert.alert("Listo", "Tu perfil se actualizó correctamente");
+      router.back();
     } catch (error) {
-      console.error("Error updating username:", error);
+      console.error("Error updating profile:", error);
+      Alert.alert("Error", "Ocurrió un problema al actualizar tu perfil");
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadUserData();
-  }, []);
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <KeyboardAvoidingView
@@ -110,25 +194,18 @@ export default function editProfile() {
             </TouchableOpacity>
           </View>
           <View className="flex-1 items-center justify-start">
-            <View className="mb-4">
-              <Text className="mb-2 font-semibold text-2xl">Foto de Perfil</Text>
+            <View className="mb-4 justify-center items-center">
               <Image
                 source={{
-                  uri: user?.avatar_url || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+                  uri: imageUri || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
                 }}
                 style={{ width: 200, height: 200, borderRadius: 100 }}
               />
-              <TextInput
-                className="border border-gray-300 rounded-md p-2 w-64 mt-4"
-                placeholder={user?.avatar_url || "URL de la Foto de Perfil"}
-                value={newAvatarUrl}
-                onChangeText={setNewAvatarUrl}
-              />
               <TouchableOpacity
-                onPress={() => changeProfileAvatar(newAvatarUrl)}
-                className="mt-4 bg-slate-500 px-4 py-2 rounded w-40 h-10 items-center justify-center"
+                className= {`mt-4 w-64 py-3 rounded-xl border border-slate-400 bg-[#1B5BA5] items-center shadow-sm`}
+                onPress={pickImage}
               >
-                <Text className="text-white font-bold">Actualizar Foto</Text>
+                <Text className="text-white font-bold">Seleccionar nueva foto de perfil</Text>
               </TouchableOpacity>
             </View>
 
@@ -137,7 +214,7 @@ export default function editProfile() {
               <TextInput
                 className="border border-gray-300 rounded-md p-2 w-64 mb-4"
                 placeholder="Tu Nombre Completo"
-                defaultValue={user?.nombre || ""}
+                value={newFullName}
                 onChangeText={setNewFullName}
               />
             </View>
@@ -146,20 +223,24 @@ export default function editProfile() {
               <TextInput
                 className="border border-gray-300 rounded-md p-2 w-64 mb-4"
                 placeholder="Tu Biografía"
-                defaultValue={user?.biografia || ""}
+                value={newBio}
                 numberOfLines={4}
                 textAlignVertical="top"
                 onChangeText={setNewBio}
               />
             </View>
             <TouchableOpacity
-              onPress={() => {
-                changeUserInfo(newFullName, newBio);
-                console.log("Updating user info");
-              }}
-              className="mt-4 bg-gray-500 justify-center rounded w-64 h-16 items-center"
+              onPress={handleSaveProfile}
+              className={`flex-row mt-4 w-64 py-3 rounded-xl border border-slate-400 bg-[#1B5BA5] items-center justify-center shadow-sm ${loading ? "opacity-70" : ""}`}
             >
-              <Text className="text-white font-bold">Actualizar Información</Text>
+              <Text className="text-white font-bold">Actualizar Información </Text>
+              {loading ? (
+                <ActivityIndicator
+                  className="flex"
+                  size="small"
+                  color="#fff"
+                />
+              ) : null}
             </TouchableOpacity>
           </View>
         </ScrollView>
