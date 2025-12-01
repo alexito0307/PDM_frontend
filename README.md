@@ -49,29 +49,8 @@ Las imágenes se almacenan en **Cloudinary** y el backend está desplegado en **
 ---
 
 ## 📂 Estructura del proyecto
-app/
-├── screens/
-│ ├── login/
-│ ├── signin/
-│ ├── edit.tsx
-│ ├── fullpost/[id].tsx
-│
-├── (tabs)/
-│ ├── feed/
-│ ├── create-post/
-│ └── profile/
-│
-├── components/
-│ ├── FeedHeader.tsx
-│ ├── PostCard.tsx
-│ └── CommentCard.tsx
-│
-├── stores/
-│ └── authStore.tsx
-│
-├── _layout.tsx
-└── index.tsx
 
+<img width="176" height="594" alt="image" src="https://github.com/user-attachments/assets/cfcd6661-89b8-4ab4-97b6-9a4a732b3554" />
 
 ---
 
