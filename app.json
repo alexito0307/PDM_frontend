@@ -39,9 +39,8 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "c9000002-48b1-4b46-b56d-f60ad91f64f6"
+        "projectId": "d7fb4c90-d5de-415d-ad10-9ce52714de1e"
       }
-    },
-    "owner": "alejandro_ponce"
+    }
   }
 }

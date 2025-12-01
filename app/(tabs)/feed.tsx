@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, ActivityIndicator, FlatList } from "react-native";
+import { Text, ActivityIndicator, FlatList, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PostCard from "../components/feed/PostCard";
 import FeedHeader from "../components/feed/FeedHeader";
@@ -25,7 +25,7 @@ export default function Feed() {
       setLoading(true);
       setErrorMsg(null);
 
-      const res = await fetch(`${API_URL}/posts`, {
+      const res = await fetch(`${API_URL}/posts/`, {
         headers: token
           ? {
               Authorization: `Bearer ${token}`,
@@ -110,10 +110,6 @@ export default function Feed() {
 
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" className="mt-10" />
-      ) : errorMsg ? (
-        <Text className="text-red-500 text-center mt-10 px-4">
-          Error loading posts: {errorMsg}
-        </Text>
       ) : (
         <FlatList
           className="p-3"
@@ -121,11 +117,19 @@ export default function Feed() {
           onRefresh={loadPosts}
           refreshing={loading}
           renderItem={({ item: post }) => (
-            <PostCard
-              post={post}
-              onLike={() => handleLike(post)}
-              currentUsername={username || ""}
-            />
+            <>
+              {errorMsg ? (
+                  <Text className="text-red-500 text-center mt-10 px-4">
+                    Error loading posts: {errorMsg}, pull to refresh
+                  </Text>
+              ) : (
+                <PostCard
+                  post={post}
+                  onLike={() => handleLike(post)}
+                  currentUsername={username || ""}
+                />
+              ) }
+            </>
           )}
           keyExtractor={(post) => post._id}
         />
