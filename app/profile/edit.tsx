@@ -6,6 +6,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,6 +18,38 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../stores/authStore";
 import * as ImagePicker from "expo-image-picker";
 import { ActivityIndicator } from "react-native";
+const CLOUDINARY_CLOUD_NAME = "dfahbky8d";         
+const CLOUDINARY_UPLOAD_PRESET = "cheicon_unsigned";
+
+async function uploadImageToCloudinary(uri: string): Promise<string> {
+  const data = new FormData();
+
+  data.append("file", {
+    uri,
+    type: "image/jpeg", // ajusta si usas otro formato
+    name: "upload.jpg",
+  } as any);
+
+  data.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: "POST",
+      body: data,
+    }
+  );
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    console.log("Error Cloudinary:", json);
+    throw new Error("Error al subir la imagen");
+  }
+
+  // URL pública https
+  return json.secure_url as string;
+}
 
 const API_URL = "https://pdm-backend-1sg4.onrender.com";
 
@@ -50,11 +83,39 @@ export default function editProfile() {
     try {
       setLoading(true);
       const token = await AsyncStorage.getItem("authToken");
-      if (!token) return;
+      if (!token) {
+        Alert.alert("Error", "No se encontró el token de sesión");
+        return;
+      }
 
-      const finalNombre = newFullName.trim() === "" ? nombre : newFullName;
-      const finalBio = newBio.trim() === "" ? biografia : newBio;
-      const finalAvatar = imageUri || avatarUrl;
+      // Nombre y bio finales (si dejan vacío, se queda lo anterior)
+      const finalNombre =
+        newFullName.trim() === "" ? nombre : newFullName.trim();
+      const finalBio = newBio.trim() === "" ? biografia : newBio.trim();
+
+      // Avatar final: partimos de lo que se ve en pantalla
+      let finalAvatar =
+        imageUri ||
+        avatarUrl ||
+        "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+
+      // Si la imagen cambió y no es http(s), la subimos a Cloudinary
+      const avatarChanged = finalAvatar !== avatarUrl;
+      const isLocalFile =
+        finalAvatar && !finalAvatar.startsWith("http://") && !finalAvatar.startsWith("https://");
+
+      if (avatarChanged && isLocalFile) {
+        try {
+          finalAvatar = await uploadImageToCloudinary(finalAvatar);
+        } catch (err) {
+          console.error("Error subiendo avatar:", err);
+          Alert.alert(
+            "Error",
+            "No se pudo subir la nueva foto de perfil. Inténtalo de nuevo."
+          );
+          return;
+        }
+      }
 
       const payload: any = {};
 
@@ -70,6 +131,7 @@ export default function editProfile() {
 
       if (Object.keys(payload).length === 0) {
         console.log("No hay cambios que guardar");
+        Alert.alert("Sin cambios", "No hiciste ningún cambio en tu perfil");
         return;
       }
 
@@ -82,18 +144,27 @@ export default function editProfile() {
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
-        console.log("User data updated successfully");
-
-        setUserInfo({
-          nombre: finalNombre ?? nombre ?? "",
-          biografia: finalBio ?? biografia ?? "",
-          avatarUrl: finalAvatar ?? avatarUrl ?? "",
-        });
-
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Error actualizando perfil:", text);
+        Alert.alert("Error", "No se pudo actualizar tu perfil");
+        return;
       }
+
+      console.log("User data updated successfully");
+
+      // Actualizar el store local con lo definitivo
+      setUserInfo({
+        nombre: finalNombre ?? nombre ?? "",
+        biografia: finalBio ?? biografia ?? "",
+        avatarUrl: finalAvatar ?? avatarUrl ?? "",
+      });
+
+      Alert.alert("Listo", "Tu perfil se actualizó correctamente");
+      router.back();
     } catch (error) {
       console.error("Error updating profile:", error);
+      Alert.alert("Error", "Ocurrió un problema al actualizar tu perfil");
     } finally {
       setLoading(false);
     }

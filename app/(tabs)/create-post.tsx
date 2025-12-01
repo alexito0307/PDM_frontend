@@ -5,6 +5,38 @@ import { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+const CLOUDINARY_CLOUD_NAME = "dfahbky8d";         
+const CLOUDINARY_UPLOAD_PRESET = "cheicon_unsigned";
+
+async function uploadImageToCloudinary(uri: string): Promise<string> {
+  const data = new FormData();
+
+  data.append("file", {
+    uri,
+    type: "image/jpeg", // ajusta si usas otro formato
+    name: "upload.jpg",
+  } as any);
+
+  data.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+    {
+      method: "POST",
+      body: data,
+    }
+  );
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    console.log("Error Cloudinary:", json);
+    throw new Error("Error al subir la imagen");
+  }
+
+  // URL pública https
+  return json.secure_url as string;
+}
 
 export default function Feed() {
   const { avatarUrl, token } = useAuthStore();
@@ -15,6 +47,8 @@ export default function Feed() {
   const [imageUri, setImageUri] = useState('');
   const posteable = title.trim().length > 0; 
   const [loading, setLoading] = useState(false);
+  
+
   
 
   const pickImage = async () => {
@@ -35,34 +69,54 @@ export default function Feed() {
   };
 
   const publish = async () => {
-    if(title == ''){
-      console.log("Faltan Datos");
+    if (!title.trim()) {
+      Alert.alert("Faltan datos", "Tu publicación necesita al menos un título");
       return;
     }
+
     try {
       setLoading(true);
+
+      let imageUrlFromCloudinary = "";
+
+      if (imageUri) {
+        // 1. Subir la imagen local a Cloudinary
+        imageUrlFromCloudinary = await uploadImageToCloudinary(imageUri);
+      }
+
+      // 2. Crear el post en tu backend con la URL https
       const res = await fetch("https://pdm-backend-1sg4.onrender.com/posts/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // si tu backend usa JWT
         },
-        body: JSON.stringify({ title, description, img_url: imageUri })
+        body: JSON.stringify({
+          title,
+          description,
+          img_url: imageUrlFromCloudinary, // aquí ya va la URL pública
+        }),
       });
+
       if (!res.ok) {
-        console.log("Titulo, descripcion o image incorrectas");
+        console.log("Error al crear el post");
+        Alert.alert("Error", "No se pudo crear el post");
         return;
       }
-      router.replace("/(tabs)/feed/");
-    } catch (err) {
-      console.log("Error al publicar post: ", err);
-    } finally {
-      setDescription("");
+
+      // limpiar y volver al feed
       setTitle("");
+      setDescription("");
       setImageUri("");
+      router.replace("/(tabs)/feed");
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Error", "Ocurrió un problema al publicar");
+    } finally {
       setLoading(false);
     }
-  }
+  };
+
 
   return (
     <SafeAreaView className="flex px-5">
