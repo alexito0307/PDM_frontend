@@ -107,7 +107,7 @@ eas build --platform android --profile production --local
 <p align="center">
   <img src="https://github.com/user-attachments/assets/dc79d93b-88c5-4331-a3dd-c6f69f17e1d6" width="220"/>
   <img src="https://github.com/user-attachments/assets/53697095-cf18-4c35-b4ad-af9ff6f11c29" width="220"/>
-  <img src="https://github.com/user-attachments/assets/53624816-f058-4fa1-bcba-9666cd8cda91" width="220"/>
+  <img src="https://github.com/user-attachments/assets/97b694a4-d51c-469d-aa34-fcd9b87311ae" width="220"/>
 </p>
 
 <p align="center">
