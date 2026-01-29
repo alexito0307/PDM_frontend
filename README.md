@@ -103,4 +103,12 @@ eas build --platform android --profile production
 eas build --platform android --profile preview
 eas build --platform android --profile production --local
 ```
-
+### App Screen Shots
+![Screenshot_20251130_152853_Expo Go](https://github.com/user-attachments/assets/dc79d93b-88c5-4331-a3dd-c6f69f17e1d6)
+![Screenshot_20251130_152857_Expo Go](https://github.com/user-attachments/assets/53697095-cf18-4c35-b4ad-af9ff6f11c29)
+![Screenshot_20251130_153357_Expo Go](https://github.com/user-attachments/assets/53624816-f058-4fa1-bcba-9666cd8cda91)
+![Screenshot_20251130_153520_Expo Go](https://github.com/user-attachments/assets/d59fa58c-512d-4092-a9e9-976142e4158d)
+![Screenshot_20251130_153620_Expo Go](https://github.com/user-attachments/assets/a7700d99-8368-491f-bd17-b019decb8648)
+![Screenshot_20251130_153632_Expo Go](https://github.com/user-attachments/assets/059c3ace-1f71-4bd7-98bb-bab86cc127c6)
+![Screenshot_20251130_153728_Expo Go](https://github.com/user-attachments/assets/68f48e09-d14b-49a3-a5bc-805fc8e5e7bd)
+![Screenshot_20251130_153816_Expo Go](https://github.com/user-attachments/assets/4241649c-0750-46b7-8302-1ff654979ee9)
